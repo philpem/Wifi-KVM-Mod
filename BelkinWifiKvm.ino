@@ -175,7 +175,47 @@ void handleRoot() {
 	IPAddress ip = WiFi.localIP();
 	String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
 	s = "<!DOCTYPE HTML>\r\n<html><head><title>KVM switch</title></head><body>\r\n";
-	s += "Hello from the KVM Switch at " + String(STAHOST) + "(" + ipStr + ")\r\n";
+	s += "Hello from the KVM Switch at " + WiFi.hostname() + " (" + ipStr + ", OUI " + WiFi.macAddress() + ")<p>\r\n";
+
+	// -- wifi status --
+	s += "WiFi is ";
+	switch (WiFi.getMode()) {
+		case WIFI_STA:
+			s += "in STATION mode, and connected to network '";
+			s += WiFi.SSID();
+			s += "' via BSSID ";
+			s += WiFi.BSSIDstr();
+			s += ". Signal strength (RSSI) is " + String(WiFi.RSSI()) + " dBm";
+			s += ".\r\n";
+			break;
+		case WIFI_AP:
+			s += "in AP mode, hosting SSID '";
+			s += WiFi.softAPSSID();
+			s += "' with ";
+			s += String(WiFi.softAPgetStationNum());
+			s += " clients on BSSID ";
+			s += WiFi.softAPmacAddress();
+			s += ".\r\n";
+			break;
+		case WIFI_AP_STA:
+			s += "in AP+STA mode, connected to network '";
+			s += WiFi.SSID();
+			s += "' via BSSID ";
+			s += WiFi.BSSIDstr();
+			s += ", and hosting SSID '";
+			s += WiFi.softAPSSID();
+			s += "' with ";
+			s += String(WiFi.softAPgetStationNum());
+			s += " clients on BSSID ";
+			s += WiFi.softAPmacAddress();
+			s += ".\r\n";
+			break;
+		case WIFI_OFF:
+			s += "OFF (and has no idea how you can see this page).\r\n";
+			break;
+	}
+
+	// -- api endpoint info --
 	s += "<p>\r\n";
 	s += "<strong>Available API endpoints:</strong>\r\n";
 	s += "<ul>\r\n";
